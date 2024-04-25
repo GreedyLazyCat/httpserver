@@ -50,11 +50,15 @@ Future<Response> onRequest(RequestContext context) async {
 
         if (message.isNotEmpty) {
           try {
+            //base64Decode(message).;
+
             final publicKey = RSAPublicKey.fromString(message);
             clientKeys.addAll({channel: publicKey});
             channel.sink.add(keyPair!.publicKey.toString());
             initPhase = !initPhase;
           } on FormatException {
+            channel.sink.add(ServerErrorCodes.WRONG_RSA_KEY.name);
+          } catch (e){
             channel.sink.add(ServerErrorCodes.WRONG_RSA_KEY.name);
           }
         } else {
