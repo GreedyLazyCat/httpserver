@@ -1,7 +1,11 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:httpserver/authentificator.dart';
-
+/*
+ * Сделать список чатрумов(их id) и соответствующих им
+ * вебсокет каналов.
+ *  
+ */
 Future<Response> onRequest(RequestContext context) async {
   final auth = context.read<Authentificator>();
   var fisrtMessage = true;

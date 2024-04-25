@@ -4,7 +4,7 @@ import 'package:httpserver/interface/user_interface.dart';
 import 'package:httpserver/repository/virtual_user_repo.dart';
 
 class Authentificator {
-  IUserRepository repo = VirtualUserRepo();
+  IUserRepository repo = VirtualDB();
   final signKey = 'zbKAqX58(J?gwZ4rnFM#t;';//change
 
   // final static Authentificator

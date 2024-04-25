@@ -3,17 +3,17 @@ import 'package:httpserver/exceptions/no_user_with_this_login.dart';
 import 'package:httpserver/interface/user_interface.dart';
 import 'package:httpserver/exceptions/wrong_password_exception.dart';
 
-class VirtualUserRepo implements IUserRepository {
+class VirtualDB implements IUserRepository {
   List<User> users = [
     User(id: 'first', login: 'admin', password: '1234'),
     User(id: 'second', login: 'antoha', password: 'gangsta')
   ];
 
-  static final VirtualUserRepo repo = VirtualUserRepo._generateSingleton();
+  static final VirtualDB repo = VirtualDB._generateSingleton();
 
-  VirtualUserRepo._generateSingleton();
+  VirtualDB._generateSingleton();
 
-  factory VirtualUserRepo() {
+  factory VirtualDB() {
     return repo;
   }
 

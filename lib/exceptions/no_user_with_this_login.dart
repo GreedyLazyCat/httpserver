@@ -1,0 +1,1 @@
+class NoUserWithThisLoginException implements Exception {}
