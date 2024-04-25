@@ -4,7 +4,19 @@ import 'package:httpserver/authentificator.dart';
 /*
  * Сделать список чатрумов(их id) и соответствующих им
  * вебсокет каналов.
- *  
+ * Формат сообщения от пользователя:
+ * {
+ *  "type": "message", тип сообщения
+ *  "chatroom_id": "id", id чатрума куда нужно отправить собщение
+ *  "text": "message text" текст сообщения
+ * }
+ * Формат ответа от сервера:
+ * {
+ *  "type": "error/message", тип сообщения сервер error - нельзя ответить
+ *  "chatroom_id": "id", id чат рума куда отправмить, если error - этого поля нет
+ * 
+ *  "text": "message text/error text"
+ * }
  */
 Future<Response> onRequest(RequestContext context) async {
   final auth = context.read<Authentificator>();
