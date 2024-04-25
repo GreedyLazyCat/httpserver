@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:httpserver/authentificator.dart';
-import 'package:httpserver/repository/no_user_with_this_login.dart';
-import 'package:httpserver/repository/wrong_password_exception.dart';
+import 'package:httpserver/exceptions/no_user_with_this_login.dart';
+import 'package:httpserver/exceptions/wrong_password_exception.dart';
 
 /*
  * Вид корректного запроса:

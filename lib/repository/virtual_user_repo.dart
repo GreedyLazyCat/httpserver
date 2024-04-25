@@ -1,7 +1,7 @@
 import 'package:httpserver/models/user.dart';
-import 'package:httpserver/repository/no_user_with_this_login.dart';
-import 'package:httpserver/repository/user_interface.dart';
-import 'package:httpserver/repository/wrong_password_exception.dart';
+import 'package:httpserver/exceptions/no_user_with_this_login.dart';
+import 'package:httpserver/interface/user_interface.dart';
+import 'package:httpserver/exceptions/wrong_password_exception.dart';
 
 class VirtualUserRepo implements IUserRepository {
   List<User> users = [
