@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_auth/dart_frog_auth.dart';
 import 'package:httpserver/authentificator.dart';

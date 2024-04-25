@@ -1,7 +1,6 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:httpserver/models/user.dart';
 import 'package:httpserver/interface/user_interface.dart';
-import 'package:httpserver/repository/virtual_user_repo.dart';
+import 'package:httpserver/models/user.dart';
 
 class Authentificator {
   IUserRepository repo;

@@ -1,15 +1,23 @@
+import 'dart:math';
+
+import 'package:httpserver/exceptions/no_user_with_this_login.dart';
+import 'package:httpserver/exceptions/wrong_password_exception.dart';
 import 'package:httpserver/interface/chat_room_repo_interface.dart';
+import 'package:httpserver/interface/user_interface.dart';
 import 'package:httpserver/models/message.dart';
 import 'package:httpserver/models/user.dart';
-import 'package:httpserver/exceptions/no_user_with_this_login.dart';
-import 'package:httpserver/interface/user_interface.dart';
-import 'package:httpserver/exceptions/wrong_password_exception.dart';
 
 class VirtualDB implements IUserRepository, IChatRoomRepository {
-  List<User> users = [
+  final List<User> users = [
     User(id: 'first', login: 'admin', password: '1234'),
     User(id: 'second', login: 'antoha', password: 'gangsta')
   ];
+
+  final Map<String, List<String>> chatrooms = {
+    "first": ["first", "second"]
+  };
+
+  final List<Message> messages = [];
 
   static final VirtualDB repo = VirtualDB._generateSingleton();
 
@@ -73,26 +81,39 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   }
 
   @override
-  Future<void> addMessageToChatRoom({required Message message}) {
-    // TODO: implement addMessageToChatRoom
-    throw UnimplementedError();
+  Future<void> addMessageToChatRoom({required Message message}) async {
+    messages.add(message);
   }
 
   @override
-  Future<void> createChatRoom(List<String> participantIds) {
-    // TODO: implement createChatRoom
-    throw UnimplementedError();
+  Future<void> createChatRoom(List<String> participantIds) async {
+    final chatroomId = generateRandomId(10);
+    if (!chatrooms.containsKey(chatroomId)) {
+      chatrooms.addAll({chatroomId: participantIds});
+    }
   }
 
   @override
-  Future<List<Message>> getChatRoomMessages(String chatroomId) {
-    // TODO: implement getChatRoomMessages
-    throw UnimplementedError();
+  Future<List<Message>> getChatRoomMessages(String chatroomId) async {
+    final messageList = List<Message>.empty();
+    for(var message in messages){
+      if(message.chatroomId == chatroomId){
+        messageList.add(message);
+      }
+    }
+    return messageList;
   }
 
   @override
   Future<List<String>> getChatroomsByParticipantId(String participantId) {
     // TODO: implement getChatroomsByParticipantId
     throw UnimplementedError();
+  }
+
+  ///Вспомогательная функция
+  String generateRandomId(int len) {
+    var r = Random();
+    return String.fromCharCodes(
+        List.generate(len, (index) => r.nextInt(33) + 89));
   }
 }
