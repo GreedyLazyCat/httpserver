@@ -13,8 +13,7 @@ import 'package:httpserver/authentificator.dart';
  * Формат ответа от сервера:
  * {
  *  "type": "error/message", тип сообщения сервер error - нельзя ответить
- *  "chatroom_id": "id", id чат рума куда отправмить, если error - этого поля нет
- * 
+ *  "chatroom_id": "id", id чат рума куда отправмить, если error - этого поля
  *  "text": "message text/error text"
  * }
  */

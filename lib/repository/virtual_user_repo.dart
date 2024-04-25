@@ -1,9 +1,11 @@
+import 'package:httpserver/interface/chat_room_repo_interface.dart';
+import 'package:httpserver/models/message.dart';
 import 'package:httpserver/models/user.dart';
 import 'package:httpserver/exceptions/no_user_with_this_login.dart';
 import 'package:httpserver/interface/user_interface.dart';
 import 'package:httpserver/exceptions/wrong_password_exception.dart';
 
-class VirtualDB implements IUserRepository {
+class VirtualDB implements IUserRepository, IChatRoomRepository {
   List<User> users = [
     User(id: 'first', login: 'admin', password: '1234'),
     User(id: 'second', login: 'antoha', password: 'gangsta')
@@ -68,5 +70,29 @@ class VirtualDB implements IUserRepository {
       throw WrongPasswordException();
     }
     return fetchedUser;
+  }
+
+  @override
+  Future<void> addMessageToChatRoom({required Message message}) {
+    // TODO: implement addMessageToChatRoom
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> createChatRoom(List<String> participantIds) {
+    // TODO: implement createChatRoom
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Message>> getChatRoomMessages(String chatroomId) {
+    // TODO: implement getChatRoomMessages
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<String>> getChatroomsByParticipantId(String participantId) {
+    // TODO: implement getChatroomsByParticipantId
+    throw UnimplementedError();
   }
 }
