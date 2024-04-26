@@ -1,11 +1,7 @@
 import 'dart:convert';
-
-import 'package:crypton/crypton.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
-import 'package:encrypt/encrypt.dart';
 import 'package:httpserver/authentificator.dart';
-import 'package:httpserver/server_response_generator.dart';
 /*
  * Сделать список чатрумов(их id) и соответствующих им
  * вебсокет каналов.
@@ -36,83 +32,19 @@ import 'package:httpserver/server_response_generator.dart';
  */
 
 final Map<String, List<WebSocketChannel>> chatrooms = {};
-final Map<WebSocketChannel, RSAKeypair> channelRSAKeys = {};
-//Заменить на ключи AES
-final Map<WebSocketChannel, RSAPublicKey> clientKeys = {};
-final Map<WebSocketChannel, Key> channelAESKeys = {};
-
 
 Future<Response> onRequest(RequestContext context) async {
   final auth = context.read<Authentificator>();
-  // var initPhase = true;
   var state = 0;
   final handler = webSocketHandler((channel, protocol) {
     channel.stream.listen((event) async {
-      if (!channelRSAKeys.containsKey(channel)) {
-        final pair = RSAKeypair.fromRandom();
-        channelRSAKeys.addAll({channel: pair});
-      }
-
-      final keyPair = channelRSAKeys[channel];
-
-      switch (state) {
-        case 0:
-          final message = event as String;
-
-          if (message.isNotEmpty) {
-            try {
-              //base64Decode(message).;
-
-              final publicKey = RSAPublicKey.fromString(message);
-              clientKeys.addAll({channel: publicKey});
-              channel.sink.add(keyPair!.publicKey.toString());
-              // initPhase = !initPhase;
-              state++;
-            } on FormatException {
-              channel.sink.add(ServerErrorCodes.WRONG_RSA_KEY.name);
-            } catch (e) {
-              channel.sink.add(ServerErrorCodes.WRONG_RSA_KEY.name);
-            }
-          } else {
-            channel.sink.add(ServerErrorCodes.WRONG_RSA_KEY.name);
-          }
-        case 1:
-          final encrypted = event as String;
-          if (encrypted == 'success') {
-            state++;
-            // print('succsess');
-            return;
-          }
-
-          final decrypted = keyPair!.privateKey.decrypt(encrypted);
-          channel.sink.add(decrypted);
-
-        case 2:
-          final clientPublicKey = clientKeys[channel];
-          try {
-            final decrypted = keyPair!.privateKey.decrypt(event as String);
-            // print(decrypted);
-            var user = await auth.tokenIsValid(decrypted);
-            if (user != null) {
-              channel.sink.add(clientKeys[channel]!.encrypt('authorized successfully'));
-              state++;
-            } else {
-              final serverMessage = clientPublicKey!.encrypt(
-                  ServerResponseGenerator.generateErrorMessage(
-                      ServerErrorCodes.UNAUTHARIZED));
-              channel.sink.add(serverMessage);
-            }
-          } catch (e) {
-            channel.sink.add('encryption error');
-          }
-      }
-      /*
-      if (initPhase) {
-        
-      } else {
-        //Блок выполняется после обмена ключами
-        
-      }*/
+      if (state == 0) {
+        var user = await auth.tokenIsValid(event as String);
+        if (user != null) {
+          state++;
+          channel.sink.add('authorized successfully');
+        }
+      } else {}
     });
   });
   return handler(context);
