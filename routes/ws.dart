@@ -38,13 +38,14 @@ Future<Response> onRequest(RequestContext context) async {
   var state = 0;
   final handler = webSocketHandler((channel, protocol) {
     channel.stream.listen((event) async {
-      if (state == 0) {
-        var user = await auth.tokenIsValid(event as String);
-        if (user != null) {
-          state++;
-          channel.sink.add('authorized successfully');
-        }
-      } else {}
+      switch (state) {
+        case 0:
+          var user = await auth.tokenIsValid(event as String);
+          if (user != null) {
+            state++;
+            channel.sink.add('authorized successfully');
+          }
+      }
     });
   });
   return handler(context);
