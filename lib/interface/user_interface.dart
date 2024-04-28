@@ -8,6 +8,7 @@ abstract class IUserRepository {
   /// в случае неправильного пароля и [NoUserWithThisLoginException], если
   /// нет такого пользователя 
   Future<User?> getOneByPasswordAndLogin(String login, String password);
+  Future<void> createUser({required String login, required String password});
   Future<void> insert(User book);
   Future<void> update(User book);
   Future<void> delete(String id);

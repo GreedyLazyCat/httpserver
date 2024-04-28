@@ -33,6 +33,7 @@ final class ServerResponseGenerator {
   static String generateChatMessage(Message message){
     return jsonEncode({
       'type': 'message',
+      'author_id': message.authorId,
       'chatroom_id': message.chatroomId,
       'body': message.text
     });

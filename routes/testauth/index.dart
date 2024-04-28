@@ -9,5 +9,5 @@ Response onRequest(RequestContext context) {
     return Response(statusCode: HttpStatus.unauthorized);
   }
   // TODO: implement route handler
-  return Response(body: 'This is a new route!');
+  return Response(body: user.id);
 }

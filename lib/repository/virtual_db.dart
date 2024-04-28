@@ -96,8 +96,8 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   @override
   Future<List<Message>> getChatRoomMessages(String chatroomId) async {
     final messageList = List<Message>.empty();
-    for(var message in messages){
-      if(message.chatroomId == chatroomId){
+    for (var message in messages) {
+      if (message.chatroomId == chatroomId) {
         messageList.add(message);
       }
     }
@@ -105,9 +105,14 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   }
 
   @override
-  Future<List<String>> getChatroomsByParticipantId(String participantId) {
-    // TODO: implement getChatroomsByParticipantId
-    throw UnimplementedError();
+  Future<List<String>> getChatroomsByParticipantId(String participantId) async {
+    List<String> result = List.empty(growable: true);
+    for (String chatroomId in chatrooms.keys) {
+      if (chatrooms[chatroomId]!.contains(participantId)) {
+        result.add(chatroomId);
+      }
+    }
+    return result;
   }
 
   ///Вспомогательная функция
@@ -115,5 +120,11 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
     var r = Random();
     return String.fromCharCodes(
         List.generate(len, (index) => r.nextInt(33) + 89));
+  }
+
+  @override
+  Future<void> createUser(
+      {required String login, required String password}) async {
+    users.add(User(id: generateRandomId(6), login: login, password: password));
   }
 }

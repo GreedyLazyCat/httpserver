@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:httpserver/authentificator.dart';
+import 'package:httpserver/encryption/encrypt.dart';
 import 'package:httpserver/exceptions/no_user_with_this_login.dart';
 import 'package:httpserver/exceptions/wrong_password_exception.dart';
 
@@ -36,6 +37,9 @@ Future<Response> onRequest(RequestContext context) async {
 
     final token = await authInMethod.getAuthToken(
         bodyDecoded['login'] as String, bodyDecoded['password'] as String);
+
+    // final bodyEncrypted =
+        // await enryptString(jsonEncode({'token': token}), await secretKey);
 
     return Response(body: jsonEncode({'token': token}));
   } on FormatException {
