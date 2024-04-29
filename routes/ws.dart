@@ -25,15 +25,6 @@ import 'package:httpserver/server_response_generator.dart';
  *  "chatroom_id": "id", id чат рума куда отправмить, если error - этого поля
  *  "text": "message text/error text"
  * }
- * TODO: добавить обмен AES ключем и шифровать им трафик
- * Алгоритм установления связи:
- * 1. Клиент отправляет свой публичный ключ
- * 2. Если все хорошо сервер отправляет свой публичный ключ
- *    и ожидает проверочного сообщения.
- * 3. Сервер расшифровывает это сообщение и отправляет назад.
- * 4. Если все правильно клиент отправит success. Сервер теперь ожидает токен
- *    аутентификации.
- * 5. Токен авторизации приходит, пользователь аутентифицируется.
  */
 
 final Map<String, List<WebSocketChannel>> chatrooms = {};
@@ -52,48 +43,56 @@ Future<Response> onRequest(RequestContext context) async {
   var state = 0;
   User? user;
   final handler = webSocketHandler((channel, protocol) {
-    channel.stream.listen((event) async {
-      switch (state) {
-        case 0:
-          // final decryptedString =
-          // await deryptString(event as String, await secretKey);
-          user = await auth.tokenIsValid(event as String);
-          if (user != null) {
-            final chatRoomRepo = auth.repo as IChatRoomRepository;
-            final userChatrooms =
-                await chatRoomRepo.getChatroomsByParticipantId(user!.id);
-            for (String chatroomId in userChatrooms) {
-              if (!chatrooms.containsKey(chatroomId)) {
-                chatrooms.addAll({
-                  chatroomId: [channel]
-                });
-              } else {
-                chatrooms[chatroomId]!.add(channel);
+    channel.stream.listen(
+      (event) async {
+        switch (state) {
+          case 0:
+            // final decryptedString =
+            // await deryptString(event as String, await secretKey);
+            user = await auth.tokenIsValid(event as String);
+            if (user != null) {
+              final chatRoomRepo = auth.repo as IChatRoomRepository;
+              final userChatrooms =
+                  await chatRoomRepo.getChatroomsByParticipantId(user!.id);
+              for (String chatroomId in userChatrooms) {
+                if (!chatrooms.containsKey(chatroomId)) {
+                  chatrooms.addAll({
+                    chatroomId: [channel]
+                  });
+                } else {
+                  chatrooms[chatroomId]!.add(channel);
+                }
               }
+              state++;
+              // channel.sink.add('authorized successfully');
             }
-            state++;
-            // channel.sink.add('authorized successfully');
-          }
-        case 1:
-          // final decryptedString =
-          // await deryptString(event as String, await secretKey);
-          final message = event as String;
-          final messageJson = jsonDecode(message) as Map<String, dynamic>;
+          case 1:
+            // final decryptedString =
+            // await deryptString(event as String, await secretKey);
+            final message = event as String;
+            final messageJson = jsonDecode(message) as Map<String, dynamic>;
 
-          if (messageJson['type'] == 'message') {
-            final chatroomId = messageJson['chatroom_id'] as String;
-            final chatMessage = Message(
-                chatroomId: chatroomId,
-                authorId: user!.id,
-                text: messageJson['body'] as String);
-            broadcast(
-              chatrooms[chatroomId]!,
-              channel,
-              ServerResponseGenerator.generateChatMessage(chatMessage),
-            );
-          }
-      }
-    });
+            if (messageJson['type'] == 'message') {
+              final chatroomId = messageJson['chatroom_id'] as String;
+              final chatMessage = Message(
+                  chatroomId: chatroomId,
+                  authorId: user!.id,
+                  body: messageJson['body'] as String);
+              broadcast(
+                chatrooms[chatroomId]!,
+                channel,
+                ServerResponse.generateChatMessage(chatMessage),
+              );
+            }
+        }
+      },
+      onDone: () {
+        for (var chatroomId in chatrooms.keys){
+          chatrooms[chatroomId]!.remove(channel);
+        }
+      },
+    );
   });
+
   return handler(context);
 }
