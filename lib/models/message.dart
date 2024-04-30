@@ -9,10 +9,11 @@ class Message {
       {required this.chatroomId, required this.authorId, required this.body});
 
   String toJson() {
-    return jsonEncode({
-      'chatroom_id': chatroomId,
-      'author_id': authorId,
-      'body': body
-    });
+    return jsonEncode(
+        {'chatroom_id': chatroomId, 'author_id': authorId, 'body': body});
+  }
+
+  Object toObject() {
+    return {'chatroom_id': chatroomId, 'author_id': authorId, 'body': body};
   }
 }

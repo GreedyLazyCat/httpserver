@@ -5,8 +5,10 @@ import 'package:httpserver/exceptions/user_with_this_login_exists.dart';
 import 'package:httpserver/exceptions/wrong_password_exception.dart';
 import 'package:httpserver/interface/chat_room_repo_interface.dart';
 import 'package:httpserver/interface/user_interface.dart';
+import 'package:httpserver/models/chatroom.dart';
 import 'package:httpserver/models/message.dart';
 import 'package:httpserver/models/user.dart';
+import 'package:httpserver/random_key.dart';
 
 class VirtualDB implements IUserRepository, IChatRoomRepository {
   final List<User> users = [
@@ -14,9 +16,14 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
     User(id: 'second', login: 'antoha', password: 'gangsta')
   ];
 
-  final Map<String, List<String>> chatrooms = {
-    "first": ["first", "second"]
-  };
+  final List<Chatroom> chatrooms = [
+    Chatroom(
+        id: 'first',
+        participantIds: ['first', 'second'],
+        lastMessageId: 'first',
+        title: 'none',
+        type: 'pm')
+  ];
 
   final List<Message> messages = [];
 
@@ -87,11 +94,15 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   }
 
   @override
-  Future<void> createChatRoom(List<String> participantIds) async {
+  Future<void> createChatRoom(
+      String title, List<String> participantIds, String type) async {
     final chatroomId = generateRandomId(10);
-    if (!chatrooms.containsKey(chatroomId)) {
-      chatrooms.addAll({chatroomId: participantIds});
-    }
+    chatrooms.add(Chatroom(
+        id: chatroomId,
+        type: type,
+        title: title,
+        participantIds: participantIds,
+        lastMessageId: null));
   }
 
   @override
@@ -108,9 +119,9 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   @override
   Future<List<String>> getChatroomsByParticipantId(String participantId) async {
     List<String> result = List.empty(growable: true);
-    for (String chatroomId in chatrooms.keys) {
-      if (chatrooms[chatroomId]!.contains(participantId)) {
-        result.add(chatroomId);
+    for (Chatroom chatroom in chatrooms) {
+      if (chatroom.participantIds.contains(participantId)) {
+        result.add(chatroom.id);
       }
     }
     return result;
@@ -126,11 +137,17 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   @override
   Future<void> createUser(
       {required String login, required String password}) async {
-    for(var user in users){
-      if(user.login == login){
+    for (var user in users) {
+      if (user.login == login) {
         throw UserWithThisLoginExists();
       }
     }
     users.add(User(id: generateRandomId(6), login: login, password: password));
+  }
+
+  @override
+  Future<Chatroom> getChatroomById(String chatroomId) {
+    // TODO: implement getChatroomById
+    throw UnimplementedError();
   }
 }
