@@ -15,7 +15,7 @@ Future<Response> onRequest(
   var body = await request.body();
 
   switch (action) {
-    case 'get':
+    case 'read':
       final user = context.read<User>();
       return Response(body: jsonEncode({'id': user.id, 'login': user.login}));
   }

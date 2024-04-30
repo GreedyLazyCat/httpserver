@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:httpserver/models/chatroom.dart';
 import 'package:httpserver/models/message.dart';
 import 'package:httpserver/repository/virtual_db.dart';
-
 
 /*
  * Формат read {'chatroom_id': ... }
@@ -17,7 +17,13 @@ Future<Response> onRequest(
   final db = VirtualDB();
   final request = context.request;
   switch (action) {
-    case 'get':
+    case 'readone':
+      final body = jsonDecode(await request.body()) as Map<String, dynamic>;
+      final message =
+          await db.getMessageById(body['message_id'] as String);
+
+      return Response(body: message!.toJson());
+    case 'read':
       final body = jsonDecode(await request.body()) as Map<String, dynamic>;
       final messages =
           await db.getChatRoomMessages(body['chatroom_id'] as String);
@@ -27,13 +33,12 @@ Future<Response> onRequest(
         response['messages']!.add(message.toObject());
       }
       return Response(body: jsonEncode(response));
-    case 'read':
+    case 'create':
       final body = jsonDecode(await request.body()) as Map<String, dynamic>;
-      final message = Message(
+      await db.addMessageToChatRoom(
           chatroomId: body['chatroom_id'] as String,
           authorId: body['author_id'] as String,
           body: body['body'] as String);
-      await db.addMessageToChatRoom(message: message);
   }
   return Response(body: 'This is a new route!');
 }

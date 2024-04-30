@@ -6,6 +6,7 @@ import 'package:httpserver/encryption/encrypt.dart';
 import 'package:httpserver/interface/chat_room_repo_interface.dart';
 import 'package:httpserver/models/message.dart';
 import 'package:httpserver/models/user.dart';
+import 'package:httpserver/repository/virtual_db.dart';
 import 'package:httpserver/server_response_generator.dart';
 /*
  * Сделать список чатрумов(их id) и соответствующих им
@@ -41,6 +42,7 @@ void broadcast(
 Future<Response> onRequest(RequestContext context) async {
   final auth = context.read<Authentificator>();
   var state = 0;
+  final db = VirtualDB();
   User? user;
   final handler = webSocketHandler((channel, protocol) {
     channel.stream.listen(
@@ -75,6 +77,7 @@ Future<Response> onRequest(RequestContext context) async {
             if (messageJson['type'] == 'message') {
               final chatroomId = messageJson['chatroom_id'] as String;
               final chatMessage = Message(
+                  id: db.generateRandomId(10),
                   chatroomId: chatroomId,
                   authorId: user!.id,
                   body: messageJson['body'] as String);

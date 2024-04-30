@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Chatroom {
   String id;
 
@@ -14,4 +16,14 @@ class Chatroom {
       required this.title,
       required this.participantIds,
       required this.lastMessageId});
+
+  String toJson() {
+    return jsonEncode({
+      'id': id,
+      'type': type,
+      'title': title,
+      'participant_ids': participantIds,
+      'lastMessage_id': lastMessageId
+    });
+  }
 }

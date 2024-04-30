@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 class Message {
+  final String id;
   final String chatroomId;
   final String authorId;
   final String body;
 
   Message(
-      {required this.chatroomId, required this.authorId, required this.body});
+      {required this.id, required this.chatroomId, required this.authorId, required this.body});
 
   String toJson() {
     return jsonEncode(

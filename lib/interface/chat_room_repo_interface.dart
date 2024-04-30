@@ -20,7 +20,10 @@ abstract class IChatRoomRepository {
   Future<List<String>> getChatroomsByParticipantId(String participantId);
 
   ///Добавить сообщение в чатрум
-  Future<void> addMessageToChatRoom({required Message message});
+  Future<void> addMessageToChatRoom(
+      {required String chatroomId, required String authorId, required String body});
 
-  Future<Chatroom> getChatroomById(String chatroomId);
+  Future<Chatroom?> getChatroomById(String chatroomId);
+
+  Future<Message?> getMessageById(String messageId);
 }

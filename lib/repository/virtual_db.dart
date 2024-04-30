@@ -13,7 +13,8 @@ import 'package:httpserver/random_key.dart';
 class VirtualDB implements IUserRepository, IChatRoomRepository {
   final List<User> users = [
     User(id: 'first', login: 'admin', password: '1234'),
-    User(id: 'second', login: 'antoha', password: 'gangsta')
+    User(id: 'second', login: 'antoha', password: '1234'),
+    User(id: 'third', login: 'dimas', password: '1234'),
   ];
 
   final List<Chatroom> chatrooms = [
@@ -22,10 +23,22 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
         participantIds: ['first', 'second'],
         lastMessageId: 'first',
         title: 'none',
-        type: 'pm')
+        type: 'pm'),
+    Chatroom(
+        id: 'second',
+        participantIds: ['first', 'second', 'third'],
+        lastMessageId: 'none',
+        title: 'BestTitle',
+        type: 'group')
   ];
 
-  final List<Message> messages = [];
+  final List<Message> messages = [
+    Message(
+        id: 'first',
+        chatroomId: 'first',
+        authorId: 'first',
+        body: 'Test message'),
+  ];
 
   static final VirtualDB repo = VirtualDB._generateSingleton();
 
@@ -89,8 +102,15 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   }
 
   @override
-  Future<void> addMessageToChatRoom({required Message message}) async {
-    messages.add(message);
+  Future<void> addMessageToChatRoom(
+      {required String chatroomId,
+      required String authorId,
+      required String body}) async {
+    messages.add(Message(
+        id: generateRandomId(10),
+        chatroomId: chatroomId,
+        authorId: authorId,
+        body: body));
   }
 
   @override
@@ -107,7 +127,7 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
 
   @override
   Future<List<Message>> getChatRoomMessages(String chatroomId) async {
-    final messageList = List<Message>.empty();
+    final messageList = List<Message>.empty(growable: true);
     for (var message in messages) {
       if (message.chatroomId == chatroomId) {
         messageList.add(message);
@@ -146,8 +166,22 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   }
 
   @override
-  Future<Chatroom> getChatroomById(String chatroomId) {
-    // TODO: implement getChatroomById
-    throw UnimplementedError();
+  Future<Chatroom?> getChatroomById(String chatroomId) async {
+    for (var chatroom in chatrooms) {
+      if (chatroom.id == chatroomId) {
+        return chatroom;
+      }
+    }
+    return null;
+  }
+
+  @override
+  Future<Message?> getMessageById(String messageId) async {
+    for (var message in messages) {
+      if (message.id == messageId) {
+        return message;
+      }
+    }
+    return null;
   }
 }

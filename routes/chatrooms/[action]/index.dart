@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:httpserver/models/message.dart';
@@ -28,12 +29,17 @@ Future<Response> onRequest(RequestContext context, String action) async {
       return Response(body: 'added');
     case 'read':
       final user = context.read<User>();
-      final chatrooms =
-          await db.getChatroomsByParticipantId(user.id);
+      final chatrooms = await db.getChatroomsByParticipantId(user.id);
       return Response(body: jsonEncode({'chatroom_ids': chatrooms}));
     case 'readone':
       final body = jsonDecode(await request.body()) as Map<String, dynamic>;
-      final chatroom = db.getChatroomById(body['chatroom_id'] as String);
+      final chatroom = await db.getChatroomById(body['chatroom_id'] as String);
+      if (chatroom == null) {
+        return Response(
+            statusCode: HttpStatus.badRequest,
+            body: 'there is no such chatroom');
+      }
+      return Response(body: chatroom.toJson());
   }
   return Response(body: action);
 }
