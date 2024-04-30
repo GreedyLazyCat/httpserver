@@ -8,6 +8,7 @@ import 'package:httpserver/repository/virtual_db.dart';
 /*
  * Формат create {'participant_ids': [...], 'title': ...}
  * Формат read - просто авторизированный запрос
+ * Формат readone - {'chatroom_id': ... }
  */
 Future<Response> onRequest(RequestContext context, String action) async {
   final request = context.request;
@@ -30,6 +31,9 @@ Future<Response> onRequest(RequestContext context, String action) async {
       final chatrooms =
           await db.getChatroomsByParticipantId(user.id);
       return Response(body: jsonEncode({'chatroom_ids': chatrooms}));
+    case 'readone':
+      final body = jsonDecode(await request.body()) as Map<String, dynamic>;
+      final chatroom = db.getChatroomById(body['chatroom_id'] as String);
   }
   return Response(body: action);
 }
