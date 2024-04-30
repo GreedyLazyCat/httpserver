@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:httpserver/exceptions/no_user_with_this_login.dart';
+import 'package:httpserver/exceptions/user_with_this_login_exists.dart';
 import 'package:httpserver/exceptions/wrong_password_exception.dart';
 import 'package:httpserver/interface/chat_room_repo_interface.dart';
 import 'package:httpserver/interface/user_interface.dart';
@@ -125,6 +126,11 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   @override
   Future<void> createUser(
       {required String login, required String password}) async {
+    for(var user in users){
+      if(user.login == login){
+        throw UserWithThisLoginExists();
+      }
+    }
     users.add(User(id: generateRandomId(6), login: login, password: password));
   }
 }

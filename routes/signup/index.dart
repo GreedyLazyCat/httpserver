@@ -4,11 +4,11 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:httpserver/authentificator.dart';
+import 'package:httpserver/exceptions/user_with_this_login_exists.dart';
 import 'package:httpserver/models/user.dart';
 import 'package:httpserver/random_key.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  // TODO: implement route handler
   final request = context.request;
   final authInMethod = context.read<Authentificator>();
   var body = await request.body();
@@ -26,9 +26,15 @@ Future<Response> onRequest(RequestContext context) async {
           body: 'No login or password field');
     }
 
-    await authInMethod.repo.createUser(
-        login: bodyDecoded['login'] as String,
-        password: bodyDecoded['password'] as String);
+    try {
+      await authInMethod.repo.createUser(
+          login: bodyDecoded['login'] as String,
+          password: bodyDecoded['password'] as String);
+    } on UserWithThisLoginExists {
+      return Response(
+          statusCode: HttpStatus.badRequest,
+          body: 'User with this login exists');
+    }
 
     return Response(body: '');
   } on FormatException {

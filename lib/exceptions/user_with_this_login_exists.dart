@@ -1,0 +1,1 @@
+class UserWithThisLoginExists implements Exception {}
