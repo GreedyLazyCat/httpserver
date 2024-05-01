@@ -56,13 +56,13 @@ Future<Response> onRequest(RequestContext context) async {
               final chatRoomRepo = auth.repo as IChatRoomRepository;
               final userChatrooms =
                   await chatRoomRepo.getChatroomsByParticipantId(user!.id);
-              for (String chatroomId in userChatrooms) {
-                if (!chatrooms.containsKey(chatroomId)) {
+              for (var chatroom in userChatrooms) {
+                if (!chatrooms.containsKey(chatroom.id)) {
                   chatrooms.addAll({
-                    chatroomId: [channel]
+                    chatroom.id: [channel]
                   });
                 } else {
-                  chatrooms[chatroomId]!.add(channel);
+                  chatrooms[chatroom.id]!.add(channel);
                 }
               }
               state++;

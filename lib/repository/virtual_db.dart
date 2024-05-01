@@ -137,11 +137,11 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   }
 
   @override
-  Future<List<String>> getChatroomsByParticipantId(String participantId) async {
-    List<String> result = List.empty(growable: true);
-    for (Chatroom chatroom in chatrooms) {
+  Future<List<Chatroom>> getChatroomsByParticipantId(String participantId) async {
+    List<Chatroom> result = List.empty(growable: true);
+    for (var chatroom in chatrooms) {
       if (chatroom.participantIds.contains(participantId)) {
-        result.add(chatroom.id);
+        result.add(chatroom);
       }
     }
     return result;

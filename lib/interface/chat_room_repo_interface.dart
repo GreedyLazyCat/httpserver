@@ -16,8 +16,8 @@ abstract class IChatRoomRepository {
   Future<List<Message>> getChatRoomMessages(String chatroomId);
 
   ///Получает список чатрумов по [participantId] участника.
-  ///[return] список id чатрумов.
-  Future<List<String>> getChatroomsByParticipantId(String participantId);
+  ///[return] список чатрумов.
+  Future<List<Chatroom>> getChatroomsByParticipantId(String participantId);
 
   ///Добавить сообщение в чатрум
   Future<void> addMessageToChatRoom(

@@ -30,7 +30,11 @@ Future<Response> onRequest(RequestContext context, String action) async {
     case 'read':
       final user = context.read<User>();
       final chatrooms = await db.getChatroomsByParticipantId(user.id);
-      return Response(body: jsonEncode({'chatroom_ids': chatrooms}));
+      final body = {'chatrooms': []};
+      for (var chatroom in chatrooms) {
+        body['chatrooms']!.add(chatroom.toObject());
+      }
+      return Response(body: jsonEncode(body));
     case 'readone':
       final body = jsonDecode(await request.body()) as Map<String, dynamic>;
       final chatroom = await db.getChatroomById(body['chatroom_id'] as String);

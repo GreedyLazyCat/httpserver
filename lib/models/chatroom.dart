@@ -26,4 +26,14 @@ class Chatroom {
       'lastMessage_id': lastMessageId
     });
   }
+
+  Object toObject() {
+    return {
+      'id': id,
+      'type': type,
+      'title': title,
+      'participant_ids': participantIds,
+      'lastMessage_id': lastMessageId
+    };
+  }
 }

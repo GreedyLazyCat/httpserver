@@ -7,11 +7,18 @@ class Message {
   final String body;
 
   Message(
-      {required this.id, required this.chatroomId, required this.authorId, required this.body});
+      {required this.id,
+      required this.chatroomId,
+      required this.authorId,
+      required this.body});
 
   String toJson() {
-    return jsonEncode(
-        {'chatroom_id': chatroomId, 'author_id': authorId, 'body': body});
+    return jsonEncode({
+      'id': id,
+      'chatroom_id': chatroomId,
+      'author_id': authorId,
+      'body': body
+    });
   }
 
   Object toObject() {
