@@ -38,6 +38,11 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
         chatroomId: 'first',
         authorId: 'first',
         body: 'Test message'),
+    Message(
+        id: 'second',
+        chatroomId: 'first',
+        authorId: 'second',
+        body: 'Another test message')
   ];
 
   static final VirtualDB repo = VirtualDB._generateSingleton();
@@ -137,7 +142,8 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   }
 
   @override
-  Future<List<Chatroom>> getChatroomsByParticipantId(String participantId) async {
+  Future<List<Chatroom>> getChatroomsByParticipantId(
+      String participantId) async {
     List<Chatroom> result = List.empty(growable: true);
     for (var chatroom in chatrooms) {
       if (chatroom.participantIds.contains(participantId)) {

@@ -22,6 +22,6 @@ class Message {
   }
 
   Object toObject() {
-    return {'chatroom_id': chatroomId, 'author_id': authorId, 'body': body};
+    return {'id': id,'chatroom_id': chatroomId, 'author_id': authorId, 'body': body};
   }
 }
