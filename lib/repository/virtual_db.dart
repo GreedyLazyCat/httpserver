@@ -155,8 +155,13 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
   ///Вспомогательная функция
   String generateRandomId(int len) {
     var r = Random();
-    return String.fromCharCodes(
+    var result = String.fromCharCodes(
         List.generate(len, (index) => r.nextInt(33) + 89));
+    while(result.contains(r'\')){
+      var result = String.fromCharCodes(
+        List.generate(len, (index) => r.nextInt(33) + 89));
+    }
+    return result;
   }
 
   @override
