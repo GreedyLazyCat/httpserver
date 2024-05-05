@@ -10,4 +10,7 @@ class User {
   String toJson() {
     return jsonEncode({'id': id, 'login': login, 'password': password});
   }
+  Object toObject(){
+    return {'id': id, 'login': login, 'password': password};
+  }
 }

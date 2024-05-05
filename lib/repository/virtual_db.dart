@@ -8,7 +8,6 @@ import 'package:httpserver/interface/user_interface.dart';
 import 'package:httpserver/models/chatroom.dart';
 import 'package:httpserver/models/message.dart';
 import 'package:httpserver/models/user.dart';
-import 'package:httpserver/random_key.dart';
 
 class VirtualDB implements IUserRepository, IChatRoomRepository {
   final List<User> users = [
@@ -127,7 +126,7 @@ class VirtualDB implements IUserRepository, IChatRoomRepository {
         type: type,
         title: title,
         participantIds: participantIds,
-        lastMessageId: null));
+        lastMessageId: 'none'));
   }
 
   @override

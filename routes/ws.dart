@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -29,12 +30,12 @@ import 'package:httpserver/server_response_generator.dart';
  */
 
 final Map<String, List<WebSocketChannel>> chatrooms = {};
+final Map<String, WebSocketChannel> connections = {};
 
-void broadcast(
-    List<WebSocketChannel> channels, WebSocketChannel sender, String data) {
-  for (var channel in channels) {
-    if (channel != sender) {
-      channel.sink.add(data);
+void broadcast(List<String> userIds, String sender, String data) {
+  for (var userId in userIds) {
+    if (userId != sender && connections.containsKey(userId)) {
+      connections[userId]!.sink.add(data);
     }
   }
 }
@@ -51,8 +52,10 @@ Future<Response> onRequest(RequestContext context) async {
           case 0:
             // final decryptedString =
             // await deryptString(event as String, await secretKey);
-            user = await auth.tokenIsValid(event as String);
+            final body = jsonDecode(event as String) as Map<String, dynamic>;
+            user = await auth.tokenIsValid(body['token'] as String);
             if (user != null) {
+              //---------------deprecated-------------
               final chatRoomRepo = auth.repo as IChatRoomRepository;
               final userChatrooms =
                   await chatRoomRepo.getChatroomsByParticipantId(user!.id);
@@ -65,32 +68,55 @@ Future<Response> onRequest(RequestContext context) async {
                   chatrooms[chatroom.id]!.add(channel);
                 }
               }
+              //--------------------------------------
+              connections.addAll({user!.id: channel});
               state++;
-              // channel.sink.add('authorized successfully');
+              print('authorized successfully');
             }
+
           case 1:
             // final decryptedString =
             // await deryptString(event as String, await secretKey);
             final message = event as String;
             final messageJson = jsonDecode(message) as Map<String, dynamic>;
 
-            if (messageJson['type'] == 'message') {
-              final chatroomId = messageJson['chatroom_id'] as String;
-              final chatMessage = Message(
-                  id: db.generateRandomId(10),
-                  chatroomId: chatroomId,
-                  authorId: user!.id,
-                  body: messageJson['body'] as String);
-              broadcast(
-                chatrooms[chatroomId]!,
-                channel,
-                ServerResponse.generateChatMessage(chatMessage),
-              );
+            switch (messageJson['type']) {
+              case 'message':
+                final chatroomId = messageJson['chatroom_id'] as String;
+                final participantIds =
+                    (messageJson['participant_ids'] as List<dynamic>)
+                        .map((e) => e as String)
+                        .toList();
+                final chatMessage = Message(
+                    id: db.generateRandomId(10),
+                    chatroomId: messageJson['chatroom_id'] as String,
+                    authorId: user!.id,
+                    body: messageJson['body'] as String);
+
+                unawaited(db.addMessageToChatRoom(
+                    authorId: user!.id,
+                    chatroomId: chatroomId,
+                    body: messageJson['body'] as String));
+
+                broadcast(
+                  participantIds,
+                  user!.id,
+                  ServerResponse.generateChatMessage(chatMessage),
+                );
+              case 'new_chatroom':
+                final participantIds =
+                    (messageJson['participant_ids'] as List<dynamic>)
+                        .map((e) => e as String)
+                        .toList();
+                await db.createChatRoom(messageJson['title'] as String,
+                    participantIds, messageJson['chatroom_type'] as String);
+                print(participantIds);
+                broadcast(participantIds, user!.id, '{"type": "new_chatroom"}');
             }
         }
       },
       onDone: () {
-        for (var chatroomId in chatrooms.keys){
+        for (var chatroomId in chatrooms.keys) {
           chatrooms[chatroomId]!.remove(channel);
         }
       },

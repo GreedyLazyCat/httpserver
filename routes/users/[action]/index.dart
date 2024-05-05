@@ -17,6 +17,9 @@ Future<Response> onRequest(
   final db = VirtualDB();
 
   switch (action) {
+    case 'readall':
+      final list = (await db.getAll()).map((e) => e.toObject()).toList();
+      return Response.json(body: {'users': list});
     case 'read':
       final user = context.read<User>();
       return Response(body: jsonEncode({'id': user.id, 'login': user.login}));
